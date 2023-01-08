@@ -28,7 +28,7 @@ export default class Start extends React.Component {
                 style={styles.input}
                 onChangeText={(name) => this.setState({ name })}
                 value={this.state.name}
-                placeholder="Your Nameee"
+                placeholder="Your Name"
               />
             </View>
             <View style={styles.colorWrapper}>
