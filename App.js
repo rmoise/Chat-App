@@ -14,10 +14,6 @@ const Tab = createBottomTabNavigator();
 
 
 export default class App extends React.Component {
-/*   constructor(props) {
-    super(props);
-  this.state = { text: '' };
- } */
 render() {
   return (
     <NavigationContainer>
