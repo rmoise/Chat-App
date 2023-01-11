@@ -17,6 +17,7 @@
     "@react-navigation/bottom-tabs": "^6.5.2",
     "expo": "^47.0.12",
     "expo-status-bar": "~1.4.2",
+    "firebase": "^8.10.1",
     "npm-check": "^6.0.1",
     "react": "18.1.0",
     "react-dom": "18.1.0",
