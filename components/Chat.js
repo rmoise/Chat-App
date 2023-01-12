@@ -1,7 +1,9 @@
-import { GiftedChat, Bubble } from 'react-native-gifted-chat';
+import { GiftedChat, InputToolbar, Bubble } from 'react-native-gifted-chat';
 
 import React from 'react';
 import { View, Platform, KeyboardAvoidingView, Text } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 
 // Import functions from SDKs
 const firebase = require('firebase');
@@ -19,6 +21,9 @@ export default class Chat extends React.Component {
         name: '',
       },
       loggedInText: 'Please wait, you are getting logged in',
+         image: null,
+      location: null,
+      isConnected: false,
     };
 
     //Set up Firebase
@@ -35,36 +40,63 @@ export default class Chat extends React.Component {
     this.referenceChatMessages = firebase.firestore().collection('messages');
   }
 
+    // Get messages locally from user's device
+  async getMessages() {
+    let messages = '';
+    try {
+      messages = (await AsyncStorage.getItem('messages')) || [];
+      this.setState({
+        messages: JSON.parse(messages),
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
   componentDidMount() {
     // Set the name property to be included in the navigation bar
     let name = this.props.route.params.name;
     this.props.navigation.setOptions({ title: name });
 
-    //Anonymous user authentication
-    this.referenceChatMessages = firebase.firestore().collection('messages');
-
-    this.authUnsubscribe = firebase.auth().onAuthStateChanged((user) => {
-      if (!user) {
-        firebase.auth().signInAnonymously();
+    NetInfo.fetch().then((connection) => {
+      if (connection.isConnected) {
+        this.setState({
+          isConnected: true,
+        });
+      } else {
+        this.setState({
+          isConnected: false,
+        });
       }
-      this.setState({
-        uid: user.uid,
-        messages: [],
-        user: {
-          _id: user.uid,
-          name: name,
-        },
-        loggedInText: '',
-      });
-      this.unsubscribe = this.referenceChatMessages
-        .orderBy('createdAt', 'desc')
-        .onSnapshot(this.onCollectionUpdate);
     });
-  }
+
+        //Anonymous user authentication
+        this.referenceChatMessages = firebase.firestore().collection('messages');
+
+        this.authUnsubscribe = firebase.auth().onAuthStateChanged((user) => {
+          if (!user) {
+            firebase.auth().signInAnonymously();
+          }
+          this.setState({
+            uid: user.uid,
+            messages: [],
+            user: {
+              _id: user.uid,
+              name: name,
+            },
+            loggedInText: '',
+          });
+          this.unsubscribe = this.referenceChatMessages
+            .orderBy('createdAt', 'desc')
+            .onSnapshot(this.onCollectionUpdate);
+        });
+      }
 
   componentWillUnmount() {
-    this.unsubscribe();
-    this.authUnsubscribe();
+    if (this.isConnected) {
+      this.unsubscribe();
+      this.authUnsubscribe();
+    }
   }
 
   //Retrieve collection data & store in messages
@@ -114,8 +146,31 @@ export default class Chat extends React.Component {
       }),
       () => {
         this.addMessage();
+        this.saveMessages();
       }
     );
+  }
+
+  async saveMessages() {
+    try {
+      await AsyncStorage.setItem(
+        'messages',
+        JSON.stringify(this.state.messages)
+      );
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  async deleteMessages() {
+    try {
+      await AsyncStorage.removeItem('messages');
+      this.setState({
+        messages: [],
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
   }
 
   //Allows bubble customization
@@ -135,6 +190,13 @@ export default class Chat extends React.Component {
     );
   }
 
+  renderInputToolbar(props) {
+    if (this.state.isConnected == false) {
+    } else {
+      return <InputToolbar {...props} />;
+    }
+  }
+
   render() {
     let color = this.props.route.params.color;
     return (
@@ -142,6 +204,8 @@ export default class Chat extends React.Component {
         <Text>{this.state.loggedInText}</Text>
         <GiftedChat
           renderBubble={this.renderBubble.bind(this)}
+                    renderInputToolbar={this.renderInputToolbar.bind(this)}
+
           messages={this.state.messages}
           onSend={(messages) => this.onSend(messages)}
           user={{
