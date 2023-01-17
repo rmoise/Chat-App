@@ -119,7 +119,7 @@ Over time, however, new technologies emerged that made it easier for companies t
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-### Built With
+## Built With
 
 <!-- prettier-ignore -->
 * [![React Native][react native]][react-url]
