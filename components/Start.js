@@ -1,95 +1,121 @@
 import React from 'react';
-import { View, Text, Button, TextInput,StyleSheet, ImageBackground, TouchableOpacity, Dimensions } from 'react-native';
-import Image from "../assets/background-image.png";
+import {
+  View,
+  Text,
+  Button,
+  TextInput,
+  StyleSheet,
+  ImageBackground,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
+import Image from '../assets/background-image.png';
+import * as Font from 'expo-font';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
+
 const backgroundColors = {
-  black: '#090C08',
-  purple: '#474056',
-  grey: '#8A95A5',
-  green: '#B9C6AE',
+  black: '#556CD2',
+  purple: '#ffe0cc',
+  grey: '#E0E4E7',
+  green: '#D6EFDE',
 };
 
 export default class Start extends React.Component {
   constructor(props) {
-    super (props);
-    this.state={name: '', color:''}
+    super(props);
+    this.state = { name: '', color: '', fontsLoaded: false };
+  }
+
+  async loadFonts() {
+    await Font.loadAsync({
+      'Poppins-Bold': require('../assets/Poppins/Poppins-Bold.ttf'),
+    });
+    this.setState({ fontsLoaded: true });
+  }
+
+  componentDidMount() {
+    this.loadFonts();
   }
 
   render() {
-    return (
-      <View style={styles.container}>
-        <ImageBackground
-          source={Image}
-          style={styles.image}
-        >
-          <Text style={styles.title}>Chat App</Text>
-          <View style={styles.startWrapper}>
-            <View style={styles.inputWrapper}>
-              <TextInput
-                style={styles.input}
-                onChangeText={(name) => this.setState({ name })}
-                value={this.state.name}
-                placeholder="Your Name"
-              />
-            </View>
-            <View style={styles.colorWrapper}>
-              <Text style={styles.colorText}>Choose Background Color:</Text>
-              <View style={styles.colors}>
-                <TouchableOpacity
-                  style={[
-                    styles.color,
-                    { backgroundColor: backgroundColors.black },
-                  ]}
-                  onPress={() =>
-                    this.setState({ color: backgroundColors.black })
-                  }
-                />
-                <TouchableOpacity
-                  style={[
-                    styles.color,
-                    { backgroundColor: backgroundColors.purple },
-                  ]}
-                  onPress={() =>
-                    this.setState({ color: backgroundColors.purple })
-                  }
-                />
-                <TouchableOpacity
-                  style={[
-                    styles.color,
-                    { backgroundColor: backgroundColors.grey },
-                  ]}
-                  onPress={() =>
-                    this.setState({ color: backgroundColors.grey })
-                  }
-                />
-                <TouchableOpacity
-                  style={[
-                    styles.color,
-                    { backgroundColor: backgroundColors.green },
-                  ]}
-                  onPress={() =>
-                    this.setState({ color: backgroundColors.green })
-                  }
+    if (this.state.fontsLoaded) {
+      return (
+        <View style={styles.container}>
+          <ImageBackground source={Image} style={styles.image}>
+            <Text style={styles.title}>Chat App</Text>
+            <View style={styles.startWrapper}>
+              <View style={styles.inputWrapper}>
+                <Icon name="user" size={22} color="#757083" style={{ marginLeft: 8 }} />
+                <TextInput
+                  style={styles.input}
+                  onChangeText={(name) => this.setState({ name })}
+                  value={this.state.name}
+                  placeholder="Your Name"
                 />
               </View>
+              <View style={styles.colorWrapper}>
+                <Text style={styles.colorText}>Choose Background Color</Text>
+                <View style={styles.colors}>
+                  <TouchableOpacity
+                    style={[
+                      styles.color,
+                      { backgroundColor: backgroundColors.black },
+                    ]}
+                    onPress={() =>
+                      this.setState({ color: backgroundColors.black })
+                    }
+                  />
+                  <TouchableOpacity
+                    style={[
+                      styles.color,
+                      { backgroundColor: backgroundColors.purple },
+                    ]}
+                    onPress={() =>
+                      this.setState({ color: backgroundColors.purple })
+                    }
+                  />
+                  <TouchableOpacity
+                    style={[
+                      styles.color,
+                      { backgroundColor: backgroundColors.grey },
+                    ]}
+                    onPress={() =>
+                      this.setState({ color: backgroundColors.grey })
+                    }
+                  />
+                  <TouchableOpacity
+                    style={[
+                      styles.color,
+                      { backgroundColor: backgroundColors.green },
+                    ]}
+                    onPress={() =>
+                      this.setState({ color: backgroundColors.green })
+                    }
+                  />
+                </View>
+              </View>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() =>
+                  this.props.navigation.navigate('Chat', {
+                    name: this.state.name,
+                    color: this.state.color,
+                  })
+                }
+                accessible={true}
+                accessibilityLabel="Start chatting"
+                accessibilityHint="Enter the chat room, where you can send messages to your contacts."
+              >
+                <Text style={styles.buttonText}>Start Chatting</Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() =>
-                this.props.navigation.navigate('Chat', {
-                  name: this.state.name,
-                  color: this.state.color,
-                })
-              }
-              accessible={true}
-              accessibilityLabel='Start chatting'
-              accessibilityHint='Enter the chat room, where you can send messages to your contacts.'
-            >
-              <Text style={styles.buttonText}>Start Chatting</Text>
-            </TouchableOpacity>
-          </View>
-        </ImageBackground>
-      </View>
-    );
+          </ImageBackground>
+        </View>
+      );
+    } else {
+      return null;
+    }
   }
 }
 
@@ -100,30 +126,40 @@ const styles = StyleSheet.create({
 
   image: {
     flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    marginTop: 95,
     resizeMode: 'cover',
-    paddingVertical: '6%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '55%',
   },
 
   title: {
-    flex:1,
+    flex: 1,
     fontSize: 45,
     fontWeight: '600',
-    color: '#FFFFFF',
-    paddingTop: '10%',
-    paddingBottom: 0,
-    marginBottom: 0,
+    color: '#3C405B',
+    marginTop: -70,
+
+    marginBottom: 100,
+    fontFamily: 'Poppins-Bold',
+  },
+  text: {
+    fontSize: 16,
+    fontWeight: '300',
+    color: backgroundColors.grey,
+    fontFamily: 'Poppins-Bold',
   },
 
   startWrapper: {
     flex: 2,
     backgroundColor: 'white',
-    maxHeight: '60%',
+    maxHeight: '55%',
     width: '88%',
     alignItems: 'center',
     justifyContent: 'space-evenly',
+     borderTopLeftRadius: 20,
+       borderTopRightRadius: 20,
     //paddingVertical: '6%',
   },
 
@@ -134,7 +170,7 @@ const styles = StyleSheet.create({
     opacity: 50,
     height: 60,
     width: '88%',
-    borderColor: 'lightgrey',
+    borderColor: '#90C9F9',
     borderWidth: 2,
     borderRadius: 5,
     paddingLeft: 5,
@@ -162,7 +198,7 @@ const styles = StyleSheet.create({
     left: -2,
     paddingLeft: 35,
     paddingRight: 20,
-    width: '101%'
+    width: '101%',
   },
 
   colorWrapper: {
@@ -175,11 +211,13 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     color: '#757083',
     opacity: 100,
+    fontFamily: 'Poppins-Bold',
+    textAlign: 'center',
   },
 
   colors: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
 
   color: {
@@ -195,7 +233,8 @@ const styles = StyleSheet.create({
     width: '88%',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#757083',
+    backgroundColor: '#90C9F9',
+     borderRadius: 16,
   },
 
   buttonText: {
