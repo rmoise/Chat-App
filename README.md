@@ -41,7 +41,7 @@
 
 Build a chat app for mobile devices (Android and iOS) with React Native. The app provides users with a simple chat interface and options for sharing images and locations.
 
-<img src="./assets/Screenshot_1.png" width="285"> <img src="./assets/Screenshot_2.png" width="285">
+<img src="./assets/Screenshot_1.png" width="285"> <img src="./assets/Screenshot_1b.png" width="285">
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
